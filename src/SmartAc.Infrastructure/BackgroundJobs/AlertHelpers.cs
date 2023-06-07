@@ -1,0 +1,32 @@
+﻿using SmartAc.Application.Extensions;
+using SmartAc.Application.Options;
+using SmartAc.Domain.Alerts;
+using SmartAc.Domain.DeviceReadings;
+
+namespace SmartAc.Infrastructure.BackgroundJobs;
+
+public static class AlertHelpers
+{
+    public static bool IsResolved(DeviceReading reading, AlertType alertType, SensorParams sensorParams)
+    {
+        return alertType switch
+        {
+            AlertType.OutOfRangeTemp when
+                reading.Temperature.InRange(sensorParams.TemperatureMin, sensorParams.TemperatureMax) => true,
+
+            AlertType.OutOfRangeCo when
+                reading.CarbonMonoxide.InRange(sensorParams.CarbonMonoxidePpmMin, sensorParams.CarbonMonoxidePpmMax) => true,
+
+            AlertType.OutOfRangeHumidity when
+                reading.Humidity.InRange(sensorParams.HumidityPctMin, sensorParams.HumidityPctMax) => true,
+
+            AlertType.DangerousCoLevel when
+                reading.CarbonMonoxide < sensorParams.CarbonMonoxideDangerLevel => true,
+
+            AlertType.PoorHealth when
+                reading.Health == DeviceHealth.Ok => true,
+
+            _ => false
+        };
+    }
+}
