@@ -1,0 +1,17 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace SmartAc.Domain;
+
+public sealed class HashStore : EntityBase
+{
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; private set; }
+
+    [Required]
+    public string FromCommand { get; set; }
+
+    public DateTimeOffset OccurenceDateTime { get; private set; } = DateTimeOffset.UtcNow;
+
+    [Required] public string HashCode { get; set; }
+}

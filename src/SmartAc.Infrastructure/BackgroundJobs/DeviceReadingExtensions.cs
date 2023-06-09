@@ -5,7 +5,7 @@ using SmartAc.Domain.DeviceReadings;
 
 namespace SmartAc.Infrastructure.BackgroundJobs;
 
-public static class DeviceReadingExtensions
+internal static class DeviceReadingExtensions
 {
     public static IEnumerable<Alert> GetAlerts(this DeviceReading reading, SensorParams sensorParams)
     {
