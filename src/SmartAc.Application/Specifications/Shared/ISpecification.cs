@@ -6,7 +6,7 @@ public interface ISpecification<T>
 {
     Expression<Func<T, bool>>? Criteria { get; }
 
-    HashSet<Expression<Func<T, object>>> Includes { get; }
+    IList<Expression<Func<T, object>>> Includes { get; }
 
     HashSet<string> IncludeStrings { get; }
 

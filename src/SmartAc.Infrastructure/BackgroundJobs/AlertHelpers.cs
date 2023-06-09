@@ -5,7 +5,7 @@ using SmartAc.Domain.DeviceReadings;
 
 namespace SmartAc.Infrastructure.BackgroundJobs;
 
-public static class AlertHelpers
+internal static class AlertHelpers
 {
     public static bool IsResolved(DeviceReading reading, AlertType alertType, SensorParams sensorParams)
     {

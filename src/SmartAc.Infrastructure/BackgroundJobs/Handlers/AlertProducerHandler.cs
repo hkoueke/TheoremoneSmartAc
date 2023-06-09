@@ -14,16 +14,19 @@ internal sealed class AlertProducerHandler : AbstractHandler<DeviceReading>
     private readonly IRepository<Alert> _repository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public AlertProducerHandler(IOptions<SensorParams> options, IRepository<Alert> repository, IUnitOfWork unitOfWork)
+    public AlertProducerHandler(
+        IOptionsMonitor<SensorParams> options,
+        IRepository<Alert> repository,
+        IUnitOfWork unitOfWork)
     {
-        _sensorParams = options.Value;
+        _sensorParams = options.CurrentValue;
         _repository = repository;
         _unitOfWork = unitOfWork;
     }
 
     public override async Task Handle(DeviceReading item, CancellationToken cancellationToken)
     {
-        IEnumerable<Alert> alerts = 
+        IEnumerable<Alert> alerts =
             item.GetAlerts(_sensorParams)
                 .OrderBy(x => x.ReportedDateTime)
                 .ToList();
@@ -51,9 +54,10 @@ internal sealed class AlertProducerHandler : AbstractHandler<DeviceReading>
 
             var diff = Math.Abs((alert.ReportedDateTime - alertFromDb.ReportedDateTime).TotalMinutes);
 
-            var alertState = (diff <= _sensorParams.ReadingAgeInMinutes) switch
+            var alertState = (diff < _sensorParams.ReadingAgeInMinutes) switch
             {
                 true when alertFromDb.AlertState == AlertState.Resolved => AlertState.New,
+                true when alertFromDb.AlertState == AlertState.New => AlertState.New,
                 _ => AlertState.Resolved
             };
 
@@ -66,7 +70,7 @@ internal sealed class AlertProducerHandler : AbstractHandler<DeviceReading>
                 _repository.Add(alert);
             }
 
-            //await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         Next?.Handle(item, cancellationToken).ConfigureAwait(false);

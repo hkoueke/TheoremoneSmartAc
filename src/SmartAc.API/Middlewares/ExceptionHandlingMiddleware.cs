@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation;
 
 // ReSharper disable once IdentifierTypo
@@ -21,7 +23,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            await HandleExceptionAsync(context, e).ConfigureAwait(false);
+            await HandleExceptionAsync(context, e);
         }
     }
 
@@ -33,14 +35,31 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         {
             Title = GetTitle(exception),
             StatusCode = statusCode,
-            ErrorMessage = exception.Message,
-            Errors = GetErrors(exception)
+            ErrorMessage = statusCode switch
+            {
+                StatusCodes.Status500InternalServerError => "An Internal Server Error has occurred. Please Retry later.",
+                _ => exception.Message
+            },
+            Errors = statusCode switch
+            {
+                StatusCodes.Status500InternalServerError => null,
+                _ => GetErrors(exception)
+            }
         };
 
-        context.Response.ContentType = exception is ValidationException ? "application/problem+json" : "application/json";
+        context.Response.ContentType = exception switch
+        {
+            ValidationException => "application/problem+json",
+            _ => "application/json"
+        };
+
         context.Response.StatusCode = statusCode;
 
-        await context.Response.WriteAsJsonAsync(response);
+        await context.Response.WriteAsJsonAsync(response, 
+            new JsonSerializerOptions 
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
     }
 
     private static int GetStatusCode(Exception exception) => exception switch
@@ -51,7 +70,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
 
     private static string GetTitle(Exception exception) => exception switch
     {
-        ValidationException => "Validation Error.",
+        ValidationException => "Validation Error",
         _ => "Internal Server Error"
     };
 

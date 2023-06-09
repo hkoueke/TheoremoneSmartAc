@@ -4,7 +4,6 @@ using Microsoft.OpenApi.Models;
 using SmartAc.API.Data;
 using SmartAc.API.Identity;
 using SmartAc.Application.Options;
-using SmartAc.Infrastructure.Options;
 using SmartAc.Persistence.Repositories;
 using System.Reflection;
 using System.Security.Claims;
@@ -20,12 +19,6 @@ internal static class ConfigurationExtensions
         services
             .AddOptions<SensorParams>()
             .BindConfiguration("SensorParams");
-
-        services
-            .AddOptions<BackgroundJobParams>()
-            .BindConfiguration("BackgroundJobParams")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
     }
 
     public static void AddOpenApiDocumentation(this IServiceCollection services)

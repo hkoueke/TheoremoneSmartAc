@@ -11,14 +11,12 @@ namespace SmartAc.Infrastructure.BackgroundJobs.Handlers;
 internal sealed class AlertResolverHandler : AbstractHandler<DeviceReading>
 {
     private readonly IRepository<Alert> _repository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly SensorParams _sensorParams;
 
-    public AlertResolverHandler(IUnitOfWork unitOfWork, IRepository<Alert> repository, IOptions<SensorParams> options)
+    public AlertResolverHandler(IRepository<Alert> repository, IOptionsMonitor<SensorParams> options)
     {
         _repository = repository;
-        _unitOfWork = unitOfWork;
-        _sensorParams = options.Value;
+        _sensorParams = options.CurrentValue;
     }
 
     public override async Task Handle(DeviceReading item, CancellationToken cancellationToken)
@@ -34,8 +32,6 @@ internal sealed class AlertResolverHandler : AbstractHandler<DeviceReading>
             alert.Update(AlertState.Resolved, alert.Message, item.RecordedDateTime);
             _repository.Update(alert);
         }
-
-        //await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         Next?.Handle(item, cancellationToken).ConfigureAwait(false);
     }

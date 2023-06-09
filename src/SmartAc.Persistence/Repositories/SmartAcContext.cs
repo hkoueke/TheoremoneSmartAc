@@ -1,15 +1,15 @@
-using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartAc.Domain;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.DeviceReadings;
+using System.Reflection.Metadata;
 
 namespace SmartAc.Persistence.Repositories;
 
 public sealed class SmartAcContext : DbContext
 {
-    public SmartAcContext(DbContextOptions<SmartAcContext> options) 
+    public SmartAcContext(DbContextOptions<SmartAcContext> options)
         : base(options)
     {
     }
@@ -21,6 +21,8 @@ public sealed class SmartAcContext : DbContext
     public DbSet<DeviceReading> DeviceReadings => Set<DeviceReading>();
 
     public DbSet<Alert> Alerts => Set<Alert>();
+
+    public DbSet<HashStore> HashStores => Set<HashStore>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

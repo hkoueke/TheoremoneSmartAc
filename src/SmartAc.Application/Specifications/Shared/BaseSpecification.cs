@@ -12,7 +12,7 @@ public abstract class BaseSpecification<T> : ISpecification<T>
 
     public Expression<Func<T, bool>>? Criteria { get; }
 
-    public HashSet<Expression<Func<T, object>>> Includes { get; } = new();
+    public IList<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>();
 
     public HashSet<string> IncludeStrings { get; } = new();
 
