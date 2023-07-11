@@ -8,10 +8,10 @@ public sealed class HashStore : EntityBase
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; private set; }
 
-    [Required]
-    public string FromCommand { get; set; }
+    [Required] public string FromCommand { get; set; } = null!;
 
+    [Required] 
     public DateTimeOffset OccurenceDateTime { get; private set; } = DateTimeOffset.UtcNow;
 
-    [Required] public string HashCode { get; set; }
+    [Required] public string HashCode { get; set; } = null!;
 }

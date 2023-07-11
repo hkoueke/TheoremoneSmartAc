@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using AutoMapper;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SmartAc.Application.Abstractions.Messaging;
 using SmartAc.Application.Abstractions.Repositories;
 using SmartAc.Application.Contracts;
 using SmartAc.Application.Dto;
@@ -14,7 +14,7 @@ using SmartAc.Domain.Alerts;
 
 namespace SmartAc.Application.Features.Devices.AlertLogs;
 
-internal sealed class GetAlertLogsQueryHandler : IRequestHandler<GetAlertLogsQuery, PagedList<LogItem>>
+internal sealed class GetAlertLogsQueryHandler : IQueryHandler<GetAlertLogsQuery, PagedList<LogItem>>
 {
     private readonly IRepository<Alert> _alertRepository;
     private readonly IRepository<Device> _deviceRepository;
@@ -40,33 +40,34 @@ internal sealed class GetAlertLogsQueryHandler : IRequestHandler<GetAlertLogsQue
         };
 
         Expression<Func<Alert, bool>> predicate = alert => alertState == null
-                ? alert.DeviceSerialNumber == request.SerialNumber
-                : alert.DeviceSerialNumber == request.SerialNumber && alert.AlertState == alertState;
+            ? alert.DeviceSerialNumber == request.SerialNumber
+            : alert.DeviceSerialNumber == request.SerialNumber && alert.AlertState == alertState;
 
-        var itemsCount = await
-            _alertRepository.CountAsync(new AlertsMatchingStateSpecification(predicate), cancellationToken);
+        var hasMatchingAlerts =
+            await _alertRepository.ContainsAsync(new AlertsMatchingStateSpecification(predicate), cancellationToken);
 
-        if (itemsCount == 0)
+        if (!hasMatchingAlerts)
         {
-            return new PagedList<LogItem>(
+            return PagedList<LogItem>.ToPagedList(
                 Enumerable.Empty<LogItem>(),
-                0,
-                request.Params.PageNumber,
+                request.Params.Page,
                 request.Params.PageSize);
         }
 
-        var skip = request.Params.PageSize * (request.Params.PageNumber - 1);
+        var skip = request.Params.PageSize * (request.Params.Page - 1);
         var take = request.Params.PageSize;
 
-        var specification = alertState is null
-            ? new DevicesWithAlertsSpecification(request.SerialNumber, skip, take)
-            : new DevicesWithAlertsSpecification(request.SerialNumber, alertState.Value, skip, take);
+        var specification = alertState switch
+        {
+            not null => new DevicesWithAlertsSpecification(request.SerialNumber, alertState.Value, skip, take),
+            _ => new DevicesWithAlertsSpecification(request.SerialNumber, skip, take)
+        };
 
-        IQueryable<Device> query = _deviceRepository.GetQueryable(specification);
-        DeviceLogDto? device = await _mapper.ProjectTo<DeviceLogDto>(query).SingleAsync(cancellationToken);
-        IEnumerable<LogItem> logItems = ComputeLogItems(device, cancellationToken);
+        var query = _deviceRepository.GetQueryable(specification);
+        var device = await _mapper.ProjectTo<DeviceLogDto>(query).SingleAsync(cancellationToken);
+        var logItems = ComputeLogItems(device, cancellationToken);
 
-        return new PagedList<LogItem>(logItems, itemsCount, request.Params.PageNumber, request.Params.PageSize);
+        return PagedList<LogItem>.ToPagedList(logItems, request.Params.Page, request.Params.PageSize);
     }
 
     private static IEnumerable<LogItem> ComputeLogItems(in DeviceLogDto device, CancellationToken cancellationToken)
@@ -105,4 +106,4 @@ internal sealed class GetAlertLogsQueryHandler : IRequestHandler<GetAlertLogsQue
                     }
                 });
     }
-}    
+}

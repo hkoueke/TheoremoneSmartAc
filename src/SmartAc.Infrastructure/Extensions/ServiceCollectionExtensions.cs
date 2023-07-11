@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quartz;
 using SmartAc.Application.Abstractions.Services;
 using SmartAc.Infrastructure.BackgroundJobs;
-using SmartAc.Infrastructure.BackgroundJobs.Handlers;
 using SmartAc.Infrastructure.Options;
 using SmartAc.Infrastructure.Services;
 
@@ -32,9 +31,6 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterBackgroundServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.TryAddScoped<AlertProducerHandler>();
-        services.TryAddScoped<AlertResolverHandler>();
-
         services.AddQuartz(configure =>
         {
             var jobKey = new JobKey(nameof(ProcessNewReadingsJob));

@@ -5,9 +5,9 @@ namespace SmartAc.Application.Dto;
 
 internal sealed class DeviceLogDto
 {
-    public string SerialNumber { get; init; } = string.Empty;
+    public string SerialNumber { get; init; } = null!;
 
-    public IReadOnlyList<Alert> Alerts { get; init; } = new List<Alert>();
+    public IReadOnlyList<Alert> Alerts { get; init; } = null!;
 
-    public IReadOnlyList<DeviceReading> DeviceReadings { get; init; } = new List<DeviceReading>();
+    public IReadOnlyList<DeviceReading> DeviceReadings { get; init; } = null!;
 }

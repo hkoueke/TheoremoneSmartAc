@@ -1,35 +1,40 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace SmartAc.Application.Contracts;
 
-public sealed class PagedList<T> : List<T>
+public sealed class PagedList<T>
 {
-    public int CurrentPage { get; }
+    public IEnumerable<T> Items { get; }
 
-    public int TotalPages { get; }
+    public int Page { get; }
 
     public int PageSize { get; }
 
     public int TotalCount { get; }
 
-    public bool HasPrevious => CurrentPage > 1;
+    public bool HasPreviousPage => Page > 1;
 
-    public bool HasNext => CurrentPage < TotalPages;
+    public bool HasNextPage => Page * PageSize < TotalCount;
 
-    public PagedList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
+    private PagedList(IEnumerable<T> items, int page, int pageSize, int totalCount)
     {
-        TotalCount = count;
+        Items = items;
+        Page = page;
         PageSize = pageSize;
-        CurrentPage = pageNumber;
-        TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-        AddRange(items);
+        TotalCount = totalCount;
     }
 
-    public static PagedList<T> ToPagedList(
-        IQueryable<T> source,
-        int pageNumber,
-        int pageSize)
+    public static async Task<PagedList<T>> ToPagedListAsync(IQueryable<T> query, int page, int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        var count = source.Count();
-        var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        return new PagedList<T>(items, count, pageNumber, pageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        return new PagedList<T>(items, page, pageSize, totalCount);
+    }
+
+    public static PagedList<T> ToPagedList(IEnumerable<T> items, int page, int pageSize)
+    {
+        var listOfItems = items.ToArray();
+        return new PagedList<T>(listOfItems, page, pageSize, listOfItems.Length);
     }
 }

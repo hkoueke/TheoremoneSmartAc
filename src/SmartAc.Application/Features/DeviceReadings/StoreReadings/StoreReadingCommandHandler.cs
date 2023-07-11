@@ -1,34 +1,28 @@
 using MediatR;
+using SmartAc.Application.Abstractions.Messaging;
 using SmartAc.Application.Abstractions.Repositories;
-using SmartAc.Application.Helpers;
-using SmartAc.Domain;
 using SmartAc.Domain.DeviceReadings;
 
 namespace SmartAc.Application.Features.DeviceReadings.StoreReadings;
 
-internal sealed class StoreReadingCommandHandler : IRequestHandler<StoreReadingCommand>
+internal sealed class StoreReadingCommandHandler : ICommandHandler<StoreReadingCommand, Unit>
 {
-    private readonly IRepository<DeviceReading> _readingRepository;
-    private readonly IRepository<HashStore> _hashRepository;
+    private readonly IRepository<DeviceReading> _repository;
 
-    public StoreReadingCommandHandler(IRepository<DeviceReading> repository, IRepository<HashStore> hashRepository)
+    public StoreReadingCommandHandler(IRepository<DeviceReading> repository)
     {
-        _readingRepository = repository;
-        _hashRepository = hashRepository;
+        _repository = repository;
     }
 
-    public async Task Handle(StoreReadingCommand request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(StoreReadingCommand request, CancellationToken cancellationToken)
     {
-        if (await _hashRepository.ContainsAsync(hs => hs.HashCode == request.GetHexString(), cancellationToken))
-        {
-            return;
-        }
-
         IEnumerable<DeviceReading> readings =
             request.Readings
                 .Select(r => r.ToDeviceReading(request.DeviceSerialNumber))
                 .ToList();
 
-        _readingRepository.AddRange(readings);
+        _repository.AddRange(readings);
+
+        return Task.FromResult(Unit.Value);
     }
 }
