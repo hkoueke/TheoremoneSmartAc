@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
-using MediatR;
+using SmartAc.Application.Abstractions.Messaging;
 
 namespace SmartAc.Application.Features.Devices.Registration;
 
 public sealed record RegisterDeviceCommand(string SerialNumber, string SharedSecret, string FirmwareVersion) 
-    : IRequest<ErrorOr<string>>;
+    : ICommand<ErrorOr<string>>;

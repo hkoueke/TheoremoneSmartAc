@@ -8,7 +8,6 @@ using SmartAc.Application.Features.DeviceReadings.StoreReadings;
 using SmartAc.Application.Features.Devices.AlertLogs;
 using SmartAc.Application.Features.Devices.Registration;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using ErrorOr;
 
 namespace SmartAc.API.Controllers;
@@ -101,20 +100,9 @@ public sealed class DeviceIngestionController : ControllerBase
         [ModelBinder(BinderType = typeof(DeviceInfoBinder))] string serialNumber,
         [FromQuery] QueryParams parameters)
     {
-        PagedList<LogItem> logResult = await
+        var logResult = await
             _sender.Send(new GetAlertLogsQuery(serialNumber, parameters));
 
-        var metadata = new
-        {
-            logResult.TotalCount,
-            logResult.PageSize,
-            logResult.CurrentPage,
-            logResult.TotalPages,
-            logResult.HasNext,
-            logResult.HasPrevious
-        };
-
-        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
         return Ok(logResult);
     }
 }

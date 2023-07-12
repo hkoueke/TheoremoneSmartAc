@@ -9,16 +9,13 @@ public record SensorReading(
     decimal CarbonMonoxide,
     DeviceHealth Health)
 {
-    public DeviceReading ToDeviceReading(string serialNumber)
+    public DeviceReading ToDeviceReading(string serialNumber) => new()
     {
-        return new DeviceReading
-        {
-            DeviceSerialNumber = serialNumber,
-            RecordedDateTime = RecordedDateTime,
-            Temperature = Temperature,
-            Humidity = Humidity,
-            CarbonMonoxide = CarbonMonoxide,
-            Health = Health,
-        };
-    }
+        DeviceSerialNumber = serialNumber,
+        RecordedDateTime = RecordedDateTime,
+        Temperature = Temperature,
+        Humidity = Humidity,
+        CarbonMonoxide = CarbonMonoxide,
+        Health = Health,
+    };
 }

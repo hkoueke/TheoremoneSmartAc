@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SmartAc.Application.Abstractions.Messaging;
 using SmartAc.Application.Abstractions.Repositories;
 using SmartAc.Application.Abstractions.Services;
 using SmartAc.Application.Constants;
@@ -10,7 +10,7 @@ using SmartAc.Domain;
 
 namespace SmartAc.Application.Features.Devices.Registration;
 
-internal sealed class RegisterDeviceCommandHandler : IRequestHandler<RegisterDeviceCommand, ErrorOr<string>>
+internal sealed class RegisterDeviceCommandHandler : ICommandHandler<RegisterDeviceCommand, ErrorOr<string>>
 {
     private readonly IRepository<Device> _repository;
     private readonly ILogger<RegisterDeviceCommandHandler> _logger;
@@ -40,7 +40,9 @@ internal sealed class RegisterDeviceCommandHandler : IRequestHandler<RegisterDev
                 $"Device with serial number '{request.SerialNumber}' and provided secret was not found.");
         }
 
-        Device device = await _repository.GetQueryable(specification).SingleAsync(cancellationToken);
+        var device = await 
+            _repository.GetQueryable(specification)
+                       .SingleAsync(cancellationToken);
 
         var (tokenId, jwtToken) = 
             _jwtService.GenerateJwtFor(request.SerialNumber, JwtServiceConstants.JwtScopeDeviceIngestionService);

@@ -6,7 +6,7 @@ public sealed record QueryParams
 
     private readonly int _pageSize = 50;
 
-    public int PageNumber { get; init; } = 1;
+    public int Page { get; init; } = 1;
 
     public int PageSize
     {

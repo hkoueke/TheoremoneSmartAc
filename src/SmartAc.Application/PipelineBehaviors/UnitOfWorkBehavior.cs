@@ -1,25 +1,46 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using SmartAc.Application.Abstractions.Messaging;
 using SmartAc.Application.Abstractions.Repositories;
-using SmartAc.Application.Helpers;
+using SmartAc.Application.Extensions;
 using SmartAc.Domain;
 
 namespace SmartAc.Application.PipelineBehaviors;
 
-internal sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+internal sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<HashStore> _repository;
+    private readonly ILogger<UnitOfWorkBehavior<TRequest, TResponse>> _logger;
 
-    public UnitOfWorkBehavior(IUnitOfWork unitOfWork, IRepository<HashStore> repository)
+    public UnitOfWorkBehavior(
+        IUnitOfWork unitOfWork,
+        IRepository<HashStore> repository,
+        ILogger<UnitOfWorkBehavior<TRequest, TResponse>> logger)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (IsNotCommand())
+        if (request is not ICommand<TResponse>)
+        {
             return await next();
+        }
+
+        var idempotent = request as IIdempotentCommand<TResponse>;
+
+        if (idempotent is not null &&
+            await _repository.ContainsAsync(hs =>
+                hs.HashCode == idempotent.HashCode,
+                cancellationToken))
+        {
+            _logger.LogInformation("Request '{@RequestName}' is idempotent and has already been executed once.", request.GetType().Name);
+            return await next();
+        }
 
         //using var transactionScope = new TransactionScope(TransactionScopeOption.Required,
         //    new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -30,16 +51,11 @@ internal sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavio
         {
             var response = await next();
 
-            var hashCode = request.GetHexString();
-
-            if (!await _repository.ContainsAsync(hs => hs.HashCode == hashCode, cancellationToken))
+            _repository.Add(new HashStore
             {
-                _repository.Add(new HashStore
-                {
-                    HashCode = hashCode,
-                    FromCommand = request.GetType().Name
-                });
-            }
+                HashCode = idempotent?.HashCode ?? request.GetHashString(),
+                FromCommand = request.GetType().Name
+            });
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
@@ -52,6 +68,4 @@ internal sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavio
             throw;
         }
     }
-
-    private static bool IsNotCommand() => !typeof(TRequest).Name.EndsWith("Command");
 }
