@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartAc.Application.Abstractions.Messaging;
 
-public class CommandBase<TResult> : IIdempotentCommand<TResult>
+public class IdempotentCommand<TResult> : IIdempotentCommand<TResult>
 {
     [JsonIgnore]
     public string HashCode => this.GetHashString();
