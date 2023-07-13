@@ -3,7 +3,7 @@ using SmartAc.Application.Abstractions.Messaging;
 
 namespace SmartAc.Application.Features.DeviceReadings.StoreReadings;
 
-public sealed class StoreReadingCommand : CommandBase<Unit>
+public sealed class StoreReadingCommand : IdempotentCommand<Unit>
 {
     public StoreReadingCommand(string deviceSerialNumber, IEnumerable<SensorReading> readings)
     {
