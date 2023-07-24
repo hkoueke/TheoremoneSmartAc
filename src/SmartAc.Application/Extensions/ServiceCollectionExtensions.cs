@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         {
             config.RegisterServicesFromAssemblyContaining<AssemblyReference>();
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            config.AddOpenBehavior(typeof(IdempotencyBehavior<,>));
             config.AddOpenBehavior(typeof(UnitOfWorkBehavior<,>));
         });
     }

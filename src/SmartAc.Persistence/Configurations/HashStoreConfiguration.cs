@@ -4,13 +4,13 @@ using SmartAc.Domain;
 
 namespace SmartAc.Persistence.Configurations;
 
-internal sealed class HashStoreConfiguration : IEntityTypeConfiguration<HashStore>
+internal sealed class HashStoreConfiguration : IEntityTypeConfiguration<IdempotentRequestEntry>
 {
-    public void Configure(EntityTypeBuilder<HashStore> builder)
+    public void Configure(EntityTypeBuilder<IdempotentRequestEntry> builder)
     {
         builder.HasKey(x => x.Id);
 
-        builder.HasIndex(x => x.HashCode)
+        builder.HasIndex(x => x.HashString)
             .IsUnique();
     }
 }

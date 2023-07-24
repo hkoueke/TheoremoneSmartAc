@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SmartAc.Domain;
 
-public sealed class HashStore : EntityBase
+public sealed class IdempotentRequestEntry : EntityBase
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; private set; }
@@ -13,5 +13,5 @@ public sealed class HashStore : EntityBase
     [Required] 
     public DateTimeOffset OccurenceDateTime { get; private set; } = DateTimeOffset.UtcNow;
 
-    [Required] public string HashCode { get; set; } = null!;
+    [Required] public string HashString { get; set; } = null!;
 }

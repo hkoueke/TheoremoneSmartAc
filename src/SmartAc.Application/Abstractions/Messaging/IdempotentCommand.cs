@@ -6,5 +6,5 @@ namespace SmartAc.Application.Abstractions.Messaging;
 public class IdempotentCommand<TResult> : IIdempotentCommand<TResult>
 {
     [JsonIgnore]
-    public string HashCode => this.GetHashString();
+    public string HashString => this.GetHashString();
 }

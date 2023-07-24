@@ -22,7 +22,7 @@ public sealed class SmartAcContext : DbContext
 
     public DbSet<Alert> Alerts => Set<Alert>();
 
-    public DbSet<HashStore> HashStores => Set<HashStore>();
+    public DbSet<IdempotentRequestEntry> HashStores => Set<IdempotentRequestEntry>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
