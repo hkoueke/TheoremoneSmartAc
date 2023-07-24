@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using SmartAc.Application.Abstractions.Repositories;
+using SmartAc.Application.Abstractions.Services;
+using SmartAc.Persistence.Idempotency;
 using SmartAc.Persistence.Repositories;
 
 namespace SmartAc.Persistence;
@@ -29,6 +31,7 @@ public static class ServiceCollectionExtensions
 
         services.TryAddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.TryAddScoped<IUnitOfWork, UnitOfWork>();
+        services.TryAddScoped<IIdempotentService, IdempotentService>();
 
         return services;
     }
