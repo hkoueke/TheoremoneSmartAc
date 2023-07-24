@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SmartAc.Application.Abstractions.Messaging;
@@ -9,6 +8,8 @@ using SmartAc.Application.Specifications.Alerts;
 using SmartAc.Application.Specifications.Devices;
 using SmartAc.Domain;
 using SmartAc.Domain.Alerts;
+using SmartAc.Domain.DeviceReadings;
+using System.Linq.Expressions;
 
 // ReSharper disable PossibleMultipleEnumeration
 
@@ -88,22 +89,38 @@ internal sealed class GetAlertLogsQueryHandler : IQueryHandler<GetAlertLogsQuery
                     DateTimeCreated = alert.CreatedDateTime,
                     DateTimeReported = alert.ReportedDateTime,
                     DateTimeLastReported = alert.LastReportedDateTime,
-                    MinValue = alert.AlertType switch
-                    {
-                        AlertType.OutOfRangeTemp => readings.Min(x => x.Temperature),
-                        AlertType.OutOfRangeCo => readings.Min(x => x.CarbonMonoxide),
-                        AlertType.OutOfRangeHumidity => readings.Min(x => x.Humidity),
-                        AlertType.DangerousCoLevel => readings.Min(x => x.CarbonMonoxide),
-                        _ => 0m
-                    },
-                    MaxValue = alert.AlertType switch
-                    {
-                        AlertType.OutOfRangeTemp => readings.Max(x => x.Temperature),
-                        AlertType.OutOfRangeCo => readings.Max(x => x.CarbonMonoxide),
-                        AlertType.OutOfRangeHumidity => readings.Max(x => x.Humidity),
-                        AlertType.DangerousCoLevel => readings.Max(x => x.CarbonMonoxide),
-                        _ => 0m
-                    }
+                    MinValue = GetMinOrMax(readings, alert.AlertType, ValueType.Minimum),
+                    MaxValue = GetMinOrMax(readings, alert.AlertType, ValueType.Maximum),
                 });
+    }
+
+    private static decimal GetMinOrMax(IEnumerable<DeviceReading> readings, AlertType alertType, ValueType valueType)
+    {
+        return alertType switch
+        {
+            AlertType.OutOfRangeTemp => valueType == ValueType.Minimum
+                ? readings.Min(x => x.Temperature)
+                : readings.Max(x => x.Temperature),
+
+            AlertType.OutOfRangeCo => valueType == ValueType.Minimum
+                ? readings.Min(x => x.CarbonMonoxide)
+                : readings.Max(x => x.CarbonMonoxide),
+
+            AlertType.OutOfRangeHumidity => valueType == ValueType.Minimum
+                ? readings.Min(x => x.Humidity)
+                : readings.Max(x => x.Humidity),
+
+            AlertType.DangerousCoLevel => valueType == ValueType.Minimum
+                ? readings.Min(x => x.CarbonMonoxide)
+                : readings.Max(x => x.CarbonMonoxide),
+
+            _ => 0m
+        };
+    }
+
+    private enum ValueType
+    {
+        Minimum,
+        Maximum
     }
 }
