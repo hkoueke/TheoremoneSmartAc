@@ -18,7 +18,7 @@ internal sealed class ReadingsValidator : AbstractValidator<IEnumerable<SensorRe
     }
 }
 
-internal class SensorReadingValidator : AbstractValidator<SensorReading>
+internal sealed class SensorReadingValidator : AbstractValidator<SensorReading>
 {
     public SensorReadingValidator()
     {
