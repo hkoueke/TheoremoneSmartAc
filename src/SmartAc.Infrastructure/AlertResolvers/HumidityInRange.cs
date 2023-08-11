@@ -3,12 +3,12 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.DeviceReadings;
 
-namespace SmartAc.Infrastructure.Resolvers;
+namespace SmartAc.Infrastructure.AlertResolvers;
 
-internal sealed class TempInRange : Resolver
+internal sealed class HumidityInRange : Resolver
 {
     public override bool IsResolved(DeviceReading reading, AlertType alertType, SensorParams sensorParams)
-        => alertType == AlertType.OutOfRangeTemp &&
-           reading.Temperature.InRange(sensorParams.TemperatureMin, sensorParams.TemperatureMax) ||
+        => alertType == AlertType.OutOfRangeHumidity && 
+           reading.Humidity.InRange(sensorParams.HumidityPctMin, sensorParams.HumidityPctMax) || 
            base.IsResolved(reading, alertType, sensorParams);
 }

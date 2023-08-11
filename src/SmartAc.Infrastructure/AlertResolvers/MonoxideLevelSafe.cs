@@ -2,7 +2,7 @@
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.DeviceReadings;
 
-namespace SmartAc.Infrastructure.Resolvers;
+namespace SmartAc.Infrastructure.AlertResolvers;
 
 internal sealed class MonoxideLevelSafe : Resolver
 {

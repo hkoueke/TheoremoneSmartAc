@@ -3,7 +3,7 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.DeviceReadings;
 
-namespace SmartAc.Infrastructure.BackgroundJobs;
+namespace SmartAc.Infrastructure.Extensions;
 
 internal static class DeviceReadingExtensions
 {
