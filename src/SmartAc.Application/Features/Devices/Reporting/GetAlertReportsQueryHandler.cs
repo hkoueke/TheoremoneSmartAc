@@ -1,0 +1,30 @@
+using SmartAc.Application.Abstractions.Messaging;
+using SmartAc.Application.Contracts;
+using SmartAc.Domain.Alerts;
+using SmartAc.Domain.Services.Reporting;
+
+namespace SmartAc.Application.Features.Devices.Reporting;
+
+internal sealed class GetAlertReportsQueryHandler : IQueryHandler<GetAlertReportsQuery, PagedList<AlertReport>>
+{
+    private readonly IAlertReportService _alertReportService;
+
+    public GetAlertReportsQueryHandler(IAlertReportService alertReportService)
+    {
+        _alertReportService = alertReportService;
+    }
+
+    public async Task<PagedList<AlertReport>> Handle(GetAlertReportsQuery request, CancellationToken cancellationToken)
+    {
+        AlertState? alertState = request.Params.Filter switch
+        {
+            FilterType.New => AlertState.New,
+            FilterType.Resolved => AlertState.Resolved,
+            _ => null
+        };
+
+        var reports = await _alertReportService.ComputeAlertReportsAsync(request.SerialNumber, alertState, cancellationToken);
+
+        return PagedList<AlertReport>.ToPagedList(reports, request.Params.Page, request.Params.PageSize);
+    }
+}

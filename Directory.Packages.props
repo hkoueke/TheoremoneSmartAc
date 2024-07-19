@@ -1,0 +1,8 @@
+<Project>
+	<ItemGroup>
+		<PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />
+		<PackageVersion Include="MediatR" Version="12.1.1" />
+		<PackageVersion Include="Quartz" Version="3.7.0" />
+		<PackageVersion Include="Quartz.Extensions.Hosting" Version="3.7.0" />
+	</ItemGroup>
+</Project>
