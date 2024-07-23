@@ -2,11 +2,11 @@
 using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Devices;
-using SmartAc.Infrastructure.AlertResolvers;
+using SmartAc.Infrastructure.Alerts.Abstractions;
 
-namespace SmartAc.Infrastructure.AlertProcessors;
+namespace SmartAc.Infrastructure.Alerts.Resolvers;
 
-internal sealed class AlertResolver : Processor
+internal sealed class AlertResolver : ProcessorBase
 {
     public AlertResolver(IOptionsMonitor<SensorOptions> options) : base(options)
     {
@@ -25,11 +25,7 @@ internal sealed class AlertResolver : Processor
             return;
         }
 
-        var resolver = new TempInRangeResolver();
-        resolver.SetNext(new SensorHealthyResolver())
-                .SetNext(new MonoxideLevelSafeResolver())
-                .SetNext(new MonoxideInRangeResolver())
-                .SetNext(new HumidityInRangeResolver());
+        var resolver = Helpers.GetResolver();
 
         foreach (var reading in device.DeviceReadings)
         {

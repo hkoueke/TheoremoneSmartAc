@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
-using SmartAc.Infrastructure.Options;
 
 namespace SmartAc.Infrastructure.BackgroundJobs.Setup;
 
-internal abstract class SetupBase
+internal abstract class SetupBase<TOptions>
 {
-    protected readonly JobOptions Options;
+    protected readonly TOptions Options;
 
-    protected SetupBase(IOptionsMonitor<JobOptions> options)
+    protected SetupBase(IOptionsMonitor<TOptions> options)
     {
         Options = options.CurrentValue;
     }

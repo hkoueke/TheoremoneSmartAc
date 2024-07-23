@@ -10,7 +10,7 @@ internal sealed class ReadingsValidator : AbstractValidator<IEnumerable<SensorRe
 
         RuleFor(x => x)
             .NotEmpty()
-            .WithName("Readings");
+            .WithName("Sensor readings");
 
         RuleForEach(x => x)
             .ChildRules(r => r.RuleFor(x => x).SetValidator(new SensorReadingValidator()));

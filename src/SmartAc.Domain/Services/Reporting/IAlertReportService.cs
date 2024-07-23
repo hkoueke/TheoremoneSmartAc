@@ -4,7 +4,7 @@ namespace SmartAc.Domain.Services.Reporting;
 
 public interface IAlertReportService
 {
-    public Task<List<AlertReport>> ComputeAlertReportsAsync(
+    public Task<IEnumerable<AlertReport>> ComputeAlertReportsAsync(
         string deviceSerialNumber,
         AlertState? alertState,
         CancellationToken cancellationToken = default);
