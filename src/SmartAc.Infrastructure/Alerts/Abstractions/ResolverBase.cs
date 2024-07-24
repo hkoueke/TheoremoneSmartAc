@@ -2,7 +2,7 @@
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Readings;
 
-namespace SmartAc.Infrastructure.AlertResolvers;
+namespace SmartAc.Infrastructure.Alerts.Abstractions;
 
 internal abstract class ResolverBase
 {
@@ -14,6 +14,6 @@ internal abstract class ResolverBase
         return nextResolver;
     }
 
-    public virtual bool IsResolved(DeviceReading reading, AlertType alertType, SensorOptions sensorParams)
-        => _nextResolver?.IsResolved(reading, alertType, sensorParams) ?? false;
+    public virtual bool IsResolved(in DeviceReading reading, AlertType alertType, SensorOptions sensorOptions)
+        => _nextResolver?.IsResolved(reading, alertType, sensorOptions) ?? default;
 }

@@ -27,10 +27,10 @@ internal sealed class ValidTokenAuthorizationHandler : AuthorizationHandler<Vali
         }
 
         var isTokenValid = await _smartAcContext.Devices
-            .AnyAsync(d => d.DeviceRegistrations.Any(r => 
-                r.DeviceSerialNumber == deviceSerialNumber &&
-                r.TokenId == tokenId &&
-                r.Active));
+            .AnyAsync(d => d.DeviceRegistrations.Any(x => 
+                x.DeviceSerialNumber == deviceSerialNumber &&
+                x.TokenId == tokenId &&
+                x.Active));
 
         if (isTokenValid)
         {

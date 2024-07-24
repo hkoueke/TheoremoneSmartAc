@@ -2,11 +2,12 @@
 using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Devices;
+using SmartAc.Infrastructure.Alerts.Abstractions;
 using SmartAc.Infrastructure.Extensions;
 
-namespace SmartAc.Infrastructure.AlertProcessors;
+namespace SmartAc.Infrastructure.Alerts.Processors;
 
-internal sealed class AlertProcessor : Processor
+internal sealed class AlertProcessor : ProcessorBase
 {
     public AlertProcessor(IOptionsMonitor<SensorOptions> options) : base(options)
     {
@@ -14,11 +15,11 @@ internal sealed class AlertProcessor : Processor
 
     public override void Process(Device device)
     {
-        CreateOrUpdateAlertsFor(device);
+        CreateAlertOrUpdate(device);
         base.Process(device);
     }
 
-    private void CreateOrUpdateAlertsFor(Device device)
+    private void CreateAlertOrUpdate(Device device)
     {
         foreach (var reading in device.DeviceReadings.Where(r => !r.ProcessedOnDateTimeUtc.HasValue))
         {

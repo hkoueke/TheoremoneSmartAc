@@ -13,7 +13,7 @@ internal sealed class AlertReportService : IAlertReportService
         _context = context;
     }
 
-    public async Task<List<AlertReport>> ComputeAlertReportsAsync(
+    public async Task<IEnumerable<AlertReport>> ComputeAlertReportsAsync(
         string deviceSerialNumber,
         AlertState? alertState,
         CancellationToken cancellationToken = default)

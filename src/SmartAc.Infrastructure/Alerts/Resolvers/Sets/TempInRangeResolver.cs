@@ -2,12 +2,13 @@
 using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Readings;
+using SmartAc.Infrastructure.Alerts.Abstractions;
 
-namespace SmartAc.Infrastructure.AlertResolvers;
+namespace SmartAc.Infrastructure.Alerts.Resolvers.Sets;
 
 internal sealed class TempInRangeResolver : ResolverBase
 {
-    public override bool IsResolved(DeviceReading reading, AlertType alertType, SensorOptions sensorParams)
+    public override bool IsResolved(in DeviceReading reading, AlertType alertType, SensorOptions sensorParams)
     {
         return alertType == AlertType.OutOfRangeTemp
             && reading.Temperature.InRange(sensorParams.TemperatureMin, sensorParams.TemperatureMax)

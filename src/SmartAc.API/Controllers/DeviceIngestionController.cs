@@ -93,9 +93,9 @@ public sealed class DeviceIngestionController : ControllerBase
         [ModelBinder(BinderType = typeof(DeviceInfoBinder))] string serialNumber,
         [FromQuery] QueryParams queryParams)
     {
-        var logResult = await
+        var report = await
             _sender.Send(new GetAlertReportsQuery(serialNumber, queryParams));
 
-        return Ok(logResult);
+        return Ok(report);
     }
 }

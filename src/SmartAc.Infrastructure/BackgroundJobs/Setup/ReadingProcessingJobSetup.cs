@@ -4,7 +4,8 @@ using SmartAc.Infrastructure.Options;
 
 namespace SmartAc.Infrastructure.BackgroundJobs.Setup;
 
-internal sealed class ReadingProcessingJobSetup : SetupBase, IConfigureOptions<QuartzOptions>
+internal sealed class ReadingProcessingJobSetup : 
+    SetupBase<JobOptions>, IConfigureOptions<QuartzOptions>
 {
     public ReadingProcessingJobSetup(IOptionsMonitor<JobOptions> options) : base(options)
     {
