@@ -5,6 +5,8 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Abstractions;
 using SmartAc.Domain.Devices;
 using SmartAc.Infrastructure.Alerts;
+using SmartAc.Infrastructure.Alerts.Processors;
+using SmartAc.Infrastructure.Alerts.Resolvers;
 using SmartAc.Infrastructure.Options;
 
 namespace SmartAc.Infrastructure.BackgroundJobs;

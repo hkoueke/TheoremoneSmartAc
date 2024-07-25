@@ -10,14 +10,22 @@ namespace SmartAc.Infrastructure.Alerts;
 internal static class Helpers
 {
     public static ProcessorBase GetProcessor(IOptionsMonitor<SensorOptions> options)
-        => new AlertProcessor(options).SetNext(new AlertResolver(options));
+    {
+        var processor = new AlertProcessor(options);
+        processor.SetNext(new AlertResolver(options));
+
+        return processor;
+    }
 
     public static ResolverBase GetResolver()
     {
-        return new TempInRangeResolver()
+        var resolver = new TempInRangeResolver();
+        resolver
             .SetNext(new SensorHealthyResolver())
             .SetNext(new MonoxideLevelSafeResolver())
             .SetNext(new MonoxideInRangeResolver())
             .SetNext(new HumidityInRangeResolver());
+
+        return resolver;
     }
 }

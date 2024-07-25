@@ -20,71 +20,66 @@ internal sealed class AlertReportService : IAlertReportService
     {
         var queryData =
             from alert in _context.Alerts
-            join reading in _context.DeviceReadings on alert.DeviceSerialNumber equals reading.DeviceSerialNumber
             where !alertState.HasValue
                 ? alert.DeviceSerialNumber == deviceSerialNumber
                 : alert.DeviceSerialNumber == deviceSerialNumber && alert.AlertState == alertState
-            orderby alert.ReportedDateTimeUtc descending
+            join reading in _context.DeviceReadings on alert.DeviceSerialNumber equals reading.DeviceSerialNumber
+            group new { alert, reading } by alert.AlertId into grouped
             select new
             {
-                alert.AlertId,
-                alert.DeviceSerialNumber,
-                alert.CreatedDateTimeUtc,
-                alert.ReportedDateTimeUtc,
-                alert.LastReportedDateTimeUtc,
-                alert.AlertState,
-                alert.AlertType,
-                alert.Message,
-                reading.DeviceReadingId,
-                reading.Health,
-                reading.Temperature,
-                reading.CarbonMonoxide,
-                reading.Humidity
+                AlertId = grouped.Key,
+                Alert = grouped.Select(x => new
+                {
+                    x.alert.AlertId,
+                    x.alert.DeviceSerialNumber,
+                    x.alert.CreatedDateTimeUtc,
+                    x.alert.ReportedDateTimeUtc,
+                    x.alert.LastReportedDateTimeUtc,
+                    x.alert.AlertState,
+                    x.alert.AlertType,
+                    x.alert.Message
+                }).First(),
+                Readings = grouped.Select(x => new
+                {
+                    x.reading.DeviceReadingId,
+                    x.reading.Health,
+                    x.reading.Temperature,
+                    x.reading.CarbonMonoxide,
+                    x.reading.Humidity
+                })
             };
 
         var queryResult = await queryData.ToListAsync(cancellationToken);
 
-        List<AlertReport> reports = queryResult
-        .GroupBy(x => x.AlertId)
-        .Select(g => new
-        {
-            g.First().DeviceSerialNumber,
-            g.First().AlertType,
-            g.First().AlertState,
-            g.First().CreatedDateTimeUtc,
-            g.First().ReportedDateTimeUtc,
-            g.First().LastReportedDateTimeUtc,
-            g.First().Message,
-            MinValue = g.First().AlertType switch
+        var reports = queryResult
+            .Select(x => new AlertReport
             {
-                AlertType.OutOfRangeTemp => g.Min(x => x.Temperature),
-                AlertType.OutOfRangeCo => g.Min(x => x.CarbonMonoxide),
-                AlertType.OutOfRangeHumidity => g.Min(x => x.Humidity),
-                AlertType.DangerousCoLevel => g.Min(x => x.CarbonMonoxide),
-                _ => 0m,
-            },
-            MaxValue = g.First().AlertType switch
-            {
-                AlertType.OutOfRangeTemp => g.Max(x => x.Temperature),
-                AlertType.OutOfRangeCo => g.Max(x => x.CarbonMonoxide),
-                AlertType.OutOfRangeHumidity => g.Max(x => x.Humidity),
-                AlertType.DangerousCoLevel => g.Max(x => x.CarbonMonoxide),
-                _ => 0m,
-            }
-        })
-        .Select(g => new AlertReport
-        {
-            DeviceSerialNumber = g.DeviceSerialNumber,
-            AlertType = g.AlertType,
-            AlertState = g.AlertState,
-            CreatedDateTimeUtc = g.CreatedDateTimeUtc,
-            ReportedDateTimeUtc = g.ReportedDateTimeUtc,
-            LastReportedDateTimeUtc = g.LastReportedDateTimeUtc,
-            Message = g.Message,
-            MinValue = g.MinValue,
-            MaxValue = g.MaxValue
-        })
-        .ToList();
+                DeviceSerialNumber = x.Alert.DeviceSerialNumber,
+                AlertType = x.Alert.AlertType,
+                AlertState = x.Alert.AlertState,
+                CreatedDateTimeUtc = x.Alert.CreatedDateTimeUtc,
+                ReportedDateTimeUtc = x.Alert.ReportedDateTimeUtc,
+                LastReportedDateTimeUtc = x.Alert.LastReportedDateTimeUtc,
+                Message = x.Alert.Message,
+                MinValue = x.Alert.AlertType switch
+                {
+                    AlertType.OutOfRangeTemp => x.Readings.AsParallel().Min(x => x.Temperature),
+                    AlertType.OutOfRangeCo => x.Readings.AsParallel().Min(x => x.CarbonMonoxide),
+                    AlertType.OutOfRangeHumidity => x.Readings.AsParallel().Min(x => x.Humidity),
+                    AlertType.DangerousCoLevel => x.Readings.AsParallel().Min(x => x.CarbonMonoxide),
+                    _ => 0m,
+                },
+                MaxValue = x.Alert.AlertType switch
+                {
+                    AlertType.OutOfRangeTemp => x.Readings.AsParallel().Max(x => x.Temperature),
+                    AlertType.OutOfRangeCo => x.Readings.AsParallel().Max(x => x.CarbonMonoxide),
+                    AlertType.OutOfRangeHumidity => x.Readings.AsParallel().Max(x => x.Humidity),
+                    AlertType.DangerousCoLevel => x.Readings.AsParallel().Max(x => x.CarbonMonoxide),
+                    _ => 0m,
+                },
+            })
+            .OrderByDescending(x => x.ReportedDateTimeUtc)
+            .ToList();
 
         return reports;
     }

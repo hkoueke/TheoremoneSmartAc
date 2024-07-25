@@ -3,6 +3,7 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Devices;
 using SmartAc.Infrastructure.Alerts.Abstractions;
+using SmartAc.Infrastructure.Alerts.Resolvers.Sets;
 
 namespace SmartAc.Infrastructure.Alerts.Resolvers;
 
