@@ -1,25 +1,18 @@
-﻿using Microsoft.Extensions.Options;
-using SmartAc.Application.Options;
+﻿using SmartAc.Application.Options;
 using SmartAc.Domain.Alerts;
 using SmartAc.Domain.Devices;
 using SmartAc.Infrastructure.Alerts.Abstractions;
 using SmartAc.Infrastructure.Extensions;
 
-namespace SmartAc.Infrastructure.Alerts.Processors;
+namespace SmartAc.Infrastructure.Alerts.Handlers;
 
-internal sealed class AlertProcessor : ProcessorBase
+internal sealed class AlertProducerHandler : Processor
 {
-    public AlertProcessor(IOptionsMonitor<SensorOptions> options) : base(options)
+    public AlertProducerHandler(SensorOptions options) : base(options)
     {
     }
 
     public override void Process(Device device)
-    {
-        CreateAlertOrUpdate(device);
-        base.Process(device);
-    }
-
-    private void CreateAlertOrUpdate(Device device)
     {
         foreach (var reading in device.DeviceReadings.Where(r => !r.ProcessedOnDateTimeUtc.HasValue))
         {
@@ -69,3 +62,4 @@ internal sealed class AlertProcessor : ProcessorBase
         }
     }
 }
+

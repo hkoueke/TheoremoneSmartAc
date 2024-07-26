@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddOptions<JobOptions>()
-            .BindConfiguration($"{nameof(JobOptions)}")
+            .BindConfiguration(nameof(JobOptions))
             .ValidateDataAnnotations()
             .ValidateOnStart();
     }

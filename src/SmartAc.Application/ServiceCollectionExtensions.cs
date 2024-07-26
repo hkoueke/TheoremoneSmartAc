@@ -34,6 +34,6 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddOptions<SensorOptions>()
-            .BindConfiguration($"{nameof(SensorOptions)}");
+            .BindConfiguration(nameof(SensorOptions));
     }
 }

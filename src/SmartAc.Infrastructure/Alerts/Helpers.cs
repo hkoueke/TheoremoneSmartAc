@@ -1,30 +1,28 @@
-﻿using Microsoft.Extensions.Options;
-using SmartAc.Application.Options;
+﻿using SmartAc.Application.Options;
 using SmartAc.Infrastructure.Alerts.Abstractions;
-using SmartAc.Infrastructure.Alerts.Processors;
+using SmartAc.Infrastructure.Alerts.Handlers;
 using SmartAc.Infrastructure.Alerts.Resolvers;
-using SmartAc.Infrastructure.Alerts.Resolvers.Sets;
 
 namespace SmartAc.Infrastructure.Alerts;
 
 internal static class Helpers
 {
-    public static ProcessorBase GetProcessor(IOptionsMonitor<SensorOptions> options)
+    public static Processor GetProcessor(SensorOptions options)
     {
-        var processor = new AlertProcessor(options);
-        processor.SetNext(new AlertResolver(options));
+        var processor = new AlertProducerHandler(options);
+        processor.SetNext(new AlertResolverHandler(options));
 
         return processor;
     }
 
-    public static ResolverBase GetResolver()
+    public static Resolver GetResolver(SensorOptions options)
     {
-        var resolver = new TempInRangeResolver();
+        var resolver = new TempInRangeResolver(options);
         resolver
-            .SetNext(new SensorHealthyResolver())
-            .SetNext(new MonoxideLevelSafeResolver())
-            .SetNext(new MonoxideInRangeResolver())
-            .SetNext(new HumidityInRangeResolver());
+            .SetNext(new SensorHealthyResolver(options))
+            .SetNext(new MonoxideLevelSafeResolver(options))
+            .SetNext(new MonoxideInRangeResolver(options))
+            .SetNext(new HumidityInRangeResolver(options));
 
         return resolver;
     }
