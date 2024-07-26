@@ -5,8 +5,6 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Abstractions;
 using SmartAc.Domain.Devices;
 using SmartAc.Infrastructure.Alerts;
-using SmartAc.Infrastructure.Alerts.Processors;
-using SmartAc.Infrastructure.Alerts.Resolvers;
 using SmartAc.Infrastructure.Options;
 
 namespace SmartAc.Infrastructure.BackgroundJobs;
@@ -16,19 +14,19 @@ internal sealed class DeviceReadingProcessorJob : IJob
 {
     private readonly IDeviceRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IOptionsMonitor<SensorOptions> _sensorOptions;
+    private readonly SensorOptions _sensorOptions;
     private readonly int _batchSize;
 
     public DeviceReadingProcessorJob(
         IDeviceRepository repository,
         IUnitOfWork unitOfWork,
-        IOptionsMonitor<SensorOptions> sensorOptions,
-        IOptionsMonitor<JobOptions> jobOptions)
+        IOptionsSnapshot<SensorOptions> options,
+        IOptionsSnapshot<JobOptions> jobOptions)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
-        _sensorOptions = sensorOptions;
-        _batchSize = jobOptions.CurrentValue.BatchSize;
+        _sensorOptions = options.Value;
+        _batchSize = jobOptions.Value.BatchSize;
     }
 
     public async Task Execute(IJobExecutionContext context)
