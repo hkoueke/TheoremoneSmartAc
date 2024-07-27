@@ -10,13 +10,7 @@ internal abstract class Resolver : HandlerBase<ResolverContext>
     {
     }
 
-    public override void Handle(ResolverContext context)
-    {
-        if (!IsResolved(context))
-        {
-            base.Handle(context);
-        }
-    }
+    public override bool Handle(ResolverContext context) => IsResolved(context) || base.Handle(context);
 
     public abstract bool IsResolved(ResolverContext context);
 }

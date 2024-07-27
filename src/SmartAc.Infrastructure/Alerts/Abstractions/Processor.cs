@@ -9,10 +9,10 @@ internal abstract class Processor : HandlerBase<Device>
     {
     }
 
-    public override void Handle(Device item)
+    public override bool Handle(Device item)
     {
         Process(item);
-        base.Handle(item);
+        return base.Handle(item);
     }
 
     public abstract void Process(Device device);

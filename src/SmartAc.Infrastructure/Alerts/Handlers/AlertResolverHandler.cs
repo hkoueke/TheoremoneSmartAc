@@ -18,13 +18,12 @@ internal sealed class AlertResolverHandler : Processor
             return;
         }
 
-        var resolver = Helpers.GetResolver(SensorOptions);
+        Resolver resolver = Helpers.GetResolver(SensorOptions);
 
         foreach (var reading in device.DeviceReadings)
         {
             var alert = device.Alerts
-                .Where(a => a.AlertState == AlertState.New)
-                .Where(a => resolver.IsResolved(new ResolverContext(reading, a.AlertType)))
+                .Where(a => resolver.Handle(new ResolverContext(reading, a.AlertType)))
                 .FirstOrDefault();
 
             alert?.UpdateState(AlertState.Resolved, reading.RecordedDateTimeUtc);
