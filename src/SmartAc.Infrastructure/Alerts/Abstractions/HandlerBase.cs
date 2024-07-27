@@ -10,7 +10,7 @@ internal abstract class HandlerBase<TItem> : IHandler<TItem>
 
     protected HandlerBase(SensorOptions options) => SensorOptions = options;
 
-    public virtual void Handle(TItem item) => _nextHandler?.Handle(item);
+    public virtual bool Handle(TItem item) => _nextHandler?.Handle(item) ?? default;
 
     public IHandler<TItem> SetNext(IHandler<TItem> handler)
     {
@@ -18,4 +18,3 @@ internal abstract class HandlerBase<TItem> : IHandler<TItem>
         return handler;
     }
 }
-

@@ -5,6 +5,7 @@ using SmartAc.Application.Options;
 using SmartAc.Domain.Abstractions;
 using SmartAc.Domain.Devices;
 using SmartAc.Infrastructure.Alerts;
+using SmartAc.Infrastructure.Alerts.Abstractions;
 using SmartAc.Infrastructure.Options;
 
 namespace SmartAc.Infrastructure.BackgroundJobs;
@@ -34,11 +35,11 @@ internal sealed class DeviceReadingProcessorJob : IJob
         if (!TryGetDevicesWithUnprocessedReadings(out var devices))
             return;
 
-        var processor = Helpers.GetProcessor(_sensorOptions);
+        Processor processor = Helpers.GetProcessor(_sensorOptions);
 
         foreach (var device in devices)
         {
-            processor.Process(device);
+            processor.Handle(device);
             _repository.Update(device);
         }
 
