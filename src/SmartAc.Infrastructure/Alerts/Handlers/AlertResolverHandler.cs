@@ -23,6 +23,7 @@ internal sealed class AlertResolverHandler : Processor
         foreach (var reading in device.DeviceReadings)
         {
             var alert = device.Alerts
+                .Where(a => a.AlertState == AlertState.New)
                 .Where(a => resolver.Handle(new ResolverContext(reading, a.AlertType)))
                 .FirstOrDefault();
 

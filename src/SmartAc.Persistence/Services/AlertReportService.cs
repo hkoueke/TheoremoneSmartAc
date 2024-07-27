@@ -19,11 +19,11 @@ internal sealed class AlertReportService : IAlertReportService
         CancellationToken cancellationToken = default)
     {
         var queryData =
-            from alert in _context.Alerts
+            from alert in _context.Alerts.AsNoTracking()
             where !alertState.HasValue
                 ? alert.DeviceSerialNumber == deviceSerialNumber
                 : alert.DeviceSerialNumber == deviceSerialNumber && alert.AlertState == alertState
-            join reading in _context.DeviceReadings on alert.DeviceSerialNumber equals reading.DeviceSerialNumber
+            join reading in _context.DeviceReadings.AsNoTracking() on alert.DeviceSerialNumber equals reading.DeviceSerialNumber
             group new { alert, reading } by alert.AlertId into grouped
             select new
             {

@@ -9,6 +9,4 @@ public sealed class JobOptions
 
     [Range(5, 30)]
     public int AlertProcessingDelayInSeconds { get; set; } = 5;
-
-    public int AlertReportProcessingDelayInSeconds => AlertProcessingDelayInSeconds + 5;
 }
