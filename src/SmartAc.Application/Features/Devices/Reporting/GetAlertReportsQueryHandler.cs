@@ -1,7 +1,7 @@
 using SmartAc.Application.Abstractions.Messaging;
+using SmartAc.Application.Abstractions.Reporting;
 using SmartAc.Application.Contracts;
 using SmartAc.Domain.Alerts;
-using SmartAc.Domain.Services.Reporting;
 
 namespace SmartAc.Application.Features.Devices.Reporting;
 

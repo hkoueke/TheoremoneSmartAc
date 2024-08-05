@@ -1,7 +1,7 @@
 ﻿using SmartAc.Domain.Alerts;
 using System.Text.Json.Serialization;
 
-namespace SmartAc.Domain.Services.Reporting;
+namespace SmartAc.Application.Abstractions.Reporting;
 
 public sealed record class AlertReport
 {

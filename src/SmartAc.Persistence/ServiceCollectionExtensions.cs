@@ -5,9 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SmartAc.Domain.Abstractions;
 using SmartAc.Domain.Devices;
-using SmartAc.Domain.Services.Reporting;
 using SmartAc.Persistence.Repositories;
-using SmartAc.Persistence.Services;
 
 namespace SmartAc.Persistence;
 
@@ -36,8 +34,7 @@ public static class ServiceCollectionExtensions
             //.UseExceptionProcessor()
         });
 
-        services.AddScoped<IDeviceRepository, DeviceRepository>();
-        services.AddScoped<IAlertReportService, AlertReportService>();
+        services.AddScoped<IDeviceRepository, DeviceRepository>();       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

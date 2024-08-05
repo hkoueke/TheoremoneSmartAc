@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmartAc.Application\SmartAc.Application.csproj" />
+    <ProjectReference Include="..\SmartAc.Persistence\SmartAc.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
