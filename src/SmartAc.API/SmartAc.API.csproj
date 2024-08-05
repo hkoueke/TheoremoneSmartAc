@@ -9,7 +9,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SmartAc.Application\SmartAc.Application.csproj" />
 		<ProjectReference Include="..\SmartAc.Infrastructure\SmartAc.Infrastructure.csproj" />
-		<ProjectReference Include="..\SmartAc.Persistence\SmartAc.Persistence.csproj" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.32" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>

@@ -1,4 +1,4 @@
-namespace SmartAc.Application.Abstractions.Services;
+namespace SmartAc.Application.Abstractions.Authentication;
 
 public interface ISmartAcJwtService
 {

@@ -1,6 +1,6 @@
 ﻿using SmartAc.Domain.Alerts;
 
-namespace SmartAc.Domain.Services.Reporting;
+namespace SmartAc.Application.Abstractions.Reporting;
 
 public interface IAlertReportService
 {

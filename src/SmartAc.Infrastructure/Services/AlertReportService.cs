@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartAc.Application.Abstractions.Reporting;
 using SmartAc.Domain.Alerts;
-using SmartAc.Domain.Services.Reporting;
+using SmartAc.Persistence;
 
-namespace SmartAc.Persistence.Services;
+namespace SmartAc.Infrastructure.Services;
 
 internal sealed class AlertReportService : IAlertReportService
 {

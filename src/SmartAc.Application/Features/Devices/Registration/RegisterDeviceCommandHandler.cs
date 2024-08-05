@@ -1,8 +1,8 @@
 ﻿using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SmartAc.Application.Abstractions.Authentication;
 using SmartAc.Application.Abstractions.Messaging;
-using SmartAc.Application.Abstractions.Services;
 using SmartAc.Application.Constants;
 using SmartAc.Domain.Devices;
 using SmartAc.Domain.Registrations;
